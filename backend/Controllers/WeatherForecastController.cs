@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using backend.Services;
 
 namespace backend.Controllers;
 
@@ -12,6 +13,9 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+
+    // เพิ่ม RabbitMQ Service
+    private readonly RabbitMqService _rabbitMqService = new RabbitMqService();
 
     public WeatherForecastController(ILogger<WeatherForecastController> logger)
     {
@@ -28,5 +32,14 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
+    }
+
+    // เพิ่ม API สำหรับส่ง message เข้า RabbitMQ
+    [HttpGet("send")]
+    public IActionResult SendMessage()
+    {
+        _rabbitMqService.SendMessage("Hello from API");
+
+        return Ok("Message sent!");
     }
 }
