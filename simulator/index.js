@@ -14,7 +14,7 @@ async function sendSensorData() {
 
   try {
     const response = await axios.post(
-      "http://localhost:5153/api/sensor-data",
+      "http://localhost:5205/api/sensor-data",
       data
     );
 
