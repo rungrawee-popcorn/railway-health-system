@@ -6,7 +6,9 @@ export function useDevices() {
   return useQuery({
     queryKey: ["devices"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:5205/api/devices");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/devices`
+        
+      );
 
       if (!res.ok) {
         throw new Error("Failed to fetch devices");

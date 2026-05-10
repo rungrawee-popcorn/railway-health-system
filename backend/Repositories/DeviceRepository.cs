@@ -36,7 +36,7 @@ namespace backend.Repositories
                             location = @Location,
                             status = @Status
                         WHERE id = @Id";
-                        
+
             await connection.ExecuteAsync(sql, device);
         }
 

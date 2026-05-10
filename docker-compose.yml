@@ -1,12 +1,121 @@
 version: '3.8'
 
 services:
+  # =========================
+  # DATABASE
+  # =========================
+  postgres:
+    image: postgres:16
+    container_name: railway-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: railway
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - railway-net
+
+  # =========================
+  # RABBITMQ
+  # =========================
   rabbitmq:
     image: rabbitmq:3-management
     container_name: railway-rabbitmq
+    restart: always
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
+    networks:
+      - railway-net
+
+  # =========================
+  # BACKEND (.NET)
+  # =========================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: railway-backend
+    restart: always
+    ports:
+      - "5205:80"
+    environment:
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=railway;Username=postgres;Password=1234
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__User: admin
+      RabbitMQ__Pass: admin
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - railway-net
+
+  # =========================
+  # FRONTEND (Next.js)
+  # =========================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: railway-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:5205
+    depends_on:
+      - backend
+    networks:
+      - railway-net
+
+  # =========================
+  # AI SERVICE (FastAPI)
+  # =========================
+  ai:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: railway-ai
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - rabbitmq
+    networks:
+      - railway-net
+
+  # =========================
+  # SIMULATOR
+  # =========================
+  simulator:
+    build:
+      context: ./simulator
+      dockerfile: Dockerfile
+    container_name: railway-simulator
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - railway-net
+
+# =========================
+# VOLUMES
+# =========================
+volumes:
+  postgres_data:
+
+# =========================
+# NETWORK
+# =========================
+networks:
+  railway-net:
+    driver: bridge
