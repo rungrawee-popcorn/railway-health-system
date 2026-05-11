@@ -4,6 +4,7 @@ using System.Text;
 using backend.Data;
 using backend.Repositories;
 using backend.Services;
+using backend.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddScoped<backend.Data.DbConnectionFactory>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<DeviceRepository>();
 builder.Services.AddScoped<DeviceService>();
+builder.Services.AddScoped<DashboardRepository>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme

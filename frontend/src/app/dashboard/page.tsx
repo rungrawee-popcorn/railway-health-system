@@ -1,17 +1,19 @@
 "use client";
 
-import { useDevices } from "@/hooks/useDevices";
+import { useDashboard } from "@/hooks/useDashboard";
 
 type Device = {
   id: number;
   name: string;
   location: string;
+  temperature: number;
+  vibration: number;
   status: string;
-  created_At: string;
+  timestamp: string;
 };
 
 export default function DashboardPage() {
-  const { data = [], isLoading, isError, error } = useDevices();
+  const { data = [], isLoading, isError, error } = useDashboard();
 
   const total = data.length;
   const ok = data.filter((d: Device) => d.status === "OK").length;
@@ -117,6 +119,27 @@ export default function DashboardPage() {
                   <p className="text-xs text-slate-400 mt-3">
                     Device ID: <span className="font-medium">#{d.id}</span>
                   </p>
+
+                  {/* SENSOR DATA */}
+                  <div className="mt-4 space-y-2">
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-500">🌡 Temperature</span>
+
+                      <span className="font-semibold text-slate-700">
+                        {d.temperature}°C
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-500">📈 Vibration</span>
+
+                      <span className="font-semibold text-slate-700">
+                        {d.vibration}
+                      </span>
+                    </div>
+
+                  </div>
 
                   {/* STATUS */}
                   <div className="mt-6 flex items-center justify-between">
